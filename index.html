@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hipoteca">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f7f7f8">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Hipoteca</title>
+<style>
+  :root{
+    --bg:#f7f7f8;
+    --card:#ffffff;
+    --border:#e8e8ea;
+    --text:#1c1c1e;
+    --text-dim:#8a8a8e;
+    --text-mid:#5b5b60;
+    --green-bg:#e7f7ec;
+    --green-mid:#2e9e5b;
+    --red-bg:#fdeceb;
+    --red-mid:#d9463b;
+    --accent:#e9f6ee;
+    --accent-border:#bfe6cd;
+    --radius:18px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+    min-height:100vh;
+  }
+  header{
+    padding:22px 20px 8px;
+  }
+  header h1{
+    font-size:26px; font-weight:700; margin:0 0 2px;
+    letter-spacing:-0.3px;
+  }
+  header p{
+    margin:0; color:var(--text-dim); font-size:14px;
+  }
+  main{
+    padding:12px 16px 48px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .section-title{
+    font-size:12px; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--text-dim);
+    margin:22px 4px 8px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:4px 4px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.02);
+  }
+  .field-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+    padding:13px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  .field-row:last-child{ border-bottom:none; }
+  .field-label{
+    font-size:15px; font-weight:500; color:var(--text);
+  }
+  .field-sub{
+    font-size:12px; color:var(--text-dim); margin-top:1px;
+  }
+  .field-input-wrap{
+    display:flex; align-items:center; gap:6px; flex-shrink:0;
+  }
+  input[type=number]{
+    width:110px;
+    text-align:right;
+    font-size:16px;
+    font-weight:600;
+    color:var(--text);
+    border:none;
+    background:transparent;
+    outline:none;
+    font-family:inherit;
+    -moz-appearance:textfield;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
+  }
+  .unit{
+    font-size:14px; color:var(--text-dim); font-weight:500;
+    min-width:16px;
+  }
+  .slider-row{
+    padding:13px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  .slider-row:last-child{ border-bottom:none; }
+  .slider-top{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:8px;
+  }
+  .slider-top .field-label{ font-size:15px; }
+  .slider-val{
+    font-size:15px; font-weight:700; color:var(--green-mid);
+  }
+  input[type=range]{
+    width:100%;
+    -webkit-appearance:none;
+    height:4px;
+    border-radius:4px;
+    background:var(--border);
+    outline:none;
+    margin:4px 0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid var(--green-mid);
+    box-shadow:0 1px 3px rgba(0,0,0,0.15);
+    cursor:pointer;
+  }
+
+  .result-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    margin-bottom:12px;
+  }
+  .verdict{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 18px;
+    border-radius:var(--radius);
+    margin-bottom:14px;
+  }
+  .verdict.ok{ background:var(--green-bg); }
+  .verdict.no{ background:var(--red-bg); }
+  .verdict-text{
+    font-size:13px; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .verdict.ok .verdict-text{ color:var(--green-mid); }
+  .verdict.no .verdict-text{ color:var(--red-mid); }
+  .verdict-big{
+    font-size:22px; font-weight:800; margin-top:2px;
+  }
+  .verdict.ok .verdict-big{ color:var(--green-mid); }
+  .verdict.no .verdict-big{ color:var(--red-mid); }
+  .verdict-pill{
+    font-size:26px;
+  }
+
+  .stat-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 4px;
+    border-bottom:1px solid var(--border);
+  }
+  .stat-row:last-child{ border-bottom:none; }
+  .stat-label{
+    font-size:14.5px; color:var(--text-mid);
+  }
+  .stat-value{
+    font-size:15.5px; font-weight:700; color:var(--text);
+    text-align:right;
+  }
+  .stat-value.muted{ color:var(--text-dim); font-weight:600; }
+  .stat-value.pos{ color:var(--green-mid); }
+  .stat-value.neg{ color:var(--red-mid); }
+
+  .note{
+    font-size:12.5px; color:var(--text-dim); line-height:1.5;
+    padding:10px 4px 0;
+  }
+
+  footer{
+    text-align:center; color:var(--text-dim); font-size:11.5px;
+    padding:8px 0 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>¿Me dan la hipoteca?</h1>
+  <p>Simulador de viabilidad</p>
+</header>
+
+<main>
+
+  <div class="section-title">Tu situación</div>
+  <div class="card">
+    <div class="field-row">
+      <div>
+        <div class="field-label">Ahorros actuales</div>
+      </div>
+      <div class="field-input-wrap">
+        <input type="number" id="ahorros" inputmode="decimal">
+        <span class="unit">€</span>
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <div class="field-label">Ingreso neto mensual</div>
+      </div>
+      <div class="field-input-wrap">
+        <input type="number" id="ingreso" inputmode="decimal">
+        <span class="unit">€</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">El piso</div>
+  <div class="card">
+    <div class="field-row">
+      <div>
+        <div class="field-label">Coste del piso</div>
+      </div>
+      <div class="field-input-wrap">
+        <input type="number" id="coste" inputmode="decimal">
+        <span class="unit">€</span>
+      </div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-top">
+        <span class="field-label">Entrada</span>
+        <span class="slider-val" id="entradaVal">5%</span>
+      </div>
+      <input type="range" id="entrada" min="0" max="50" step="1">
+    </div>
+    <div class="slider-row">
+      <div class="slider-top">
+        <span class="field-label">Gastos (notaría, impuestos...)</span>
+        <span class="slider-val" id="gastosVal">6%</span>
+      </div>
+      <input type="range" id="gastos" min="0" max="20" step="0.5">
+    </div>
+  </div>
+
+  <div class="section-title">La hipoteca</div>
+  <div class="card">
+    <div class="slider-row">
+      <div class="slider-top">
+        <span class="field-label">Interés medio anual</span>
+        <span class="slider-val" id="interesVal">2.5%</span>
+      </div>
+      <input type="range" id="interes" min="0.5" max="8" step="0.05">
+    </div>
+    <div class="field-row">
+      <div>
+        <div class="field-label">Plazo</div>
+      </div>
+      <div class="field-input-wrap">
+        <input type="number" id="anios" inputmode="numeric">
+        <span class="unit">años</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Resultado</div>
+
+  <div class="verdict" id="verdictBox">
+    <div>
+      <div class="verdict-text" id="verdictLabel">CONCEDIDA</div>
+      <div class="verdict-big" id="verdictBig">SÍ</div>
+    </div>
+    <div class="verdict-pill" id="verdictPill">✓</div>
+  </div>
+
+  <div class="result-card">
+    <div class="stat-row">
+      <span class="stat-label">Necesitas (entrada + gastos)</span>
+      <span class="stat-value" id="rNecesito">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Te da el banco</span>
+      <span class="stat-value muted" id="rBanco">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Cuota mensual estimada</span>
+      <span class="stat-value" id="rCuota">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Cuota máxima admitida (35%)</span>
+      <span class="stat-value muted" id="rCuotaMax">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Ingreso mínimo necesario</span>
+      <span class="stat-value" id="rIngresoMin">—</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Te falta ahorrar</span>
+      <span class="stat-value" id="rFalta">—</span>
+    </div>
+    <div class="note">La banca suele exigir que la cuota mensual no supere el 35% del ingreso neto, y financia como máximo el 80-95% del valor del piso. Es una estimación orientativa, no una oferta bancaria.</div>
+  </div>
+
+  <footer>Cálculo guardado en este dispositivo</footer>
+
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fields = ['ahorros','ingreso','coste','entrada','gastos','interes','anios'];
+
+const defaults = {
+  ahorros: 14000,
+  ingreso: 1800,
+  coste: 270000,
+  entrada: 5,
+  gastos: 6,
+  interes: 2.5,
+  anios: 40
+};
+
+function load(){
+  let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem('hipoteca_data') || '{}'); }catch(e){}
+  fields.forEach(f=>{
+    const val = (saved[f] !== undefined) ? saved[f] : defaults[f];
+    $(f).value = val;
+  });
+}
+
+function save(){
+  const data = {};
+  fields.forEach(f=> data[f] = parseFloat($(f).value) || 0 );
+  localStorage.setItem('hipoteca_data', JSON.stringify(data));
+}
+
+function fmtEUR(n){
+  return n.toLocaleString('es-ES', {maximumFractionDigits:0}) + ' €';
+}
+
+function calc(){
+  const ahorros = parseFloat($('ahorros').value) || 0;
+  const ingreso = parseFloat($('ingreso').value) || 0;
+  const coste = parseFloat($('coste').value) || 0;
+  const entradaPct = (parseFloat($('entrada').value) || 0) / 100;
+  const gastosPct = (parseFloat($('gastos').value) || 0) / 100;
+  const interesAnual = (parseFloat($('interes').value) || 0) / 100;
+  const anios = parseFloat($('anios').value) || 0;
+
+  $('entradaVal').textContent = (entradaPct*100).toFixed(0) + '%';
+  $('gastosVal').textContent = (gastosPct*100).toFixed(1).replace(/\.0$/,'') + '%';
+  $('interesVal').textContent = (interesAnual*100).toFixed(2).replace(/\.?0+$/,'') + '%';
+
+  // Lo que necesito
+  const necesito = (entradaPct + gastosPct) * coste;
+  // Lo que da el banco
+  const banco = coste * (1 - entradaPct);
+  // interes mensual y meses
+  const interesMensual = interesAnual / 12;
+  const meses = anios * 12;
+  // cuota (amortización francesa)
+  let cuota = 0;
+  if (interesMensual > 0 && meses > 0){
+    const factor = Math.pow(1+interesMensual, meses);
+    cuota = banco * (interesMensual * factor) / (factor - 1);
+  } else if (meses > 0){
+    cuota = banco / meses;
+  }
+  // cuota maxima
+  const cuotaMax = ingreso * 0.35;
+  // concedida?
+  const concedida = !(cuota > cuotaMax || ahorros < necesito);
+  // cuanto debo cobrar
+  const ingresoMin = cuota / 0.35;
+  // cuanto ahorrar
+  const faltaAhorrar = necesito - ahorros;
+
+  $('rNecesito').textContent = fmtEUR(necesito);
+  $('rBanco').textContent = fmtEUR(banco);
+  $('rCuota').textContent = fmtEUR(Math.round(cuota)) + '/mes';
+  $('rCuotaMax').textContent = fmtEUR(Math.round(cuotaMax)) + '/mes';
+  $('rIngresoMin').textContent = fmtEUR(Math.round(ingresoMin)) + '/mes';
+
+  const rFalta = $('rFalta');
+  if (faltaAhorrar <= 0){
+    rFalta.textContent = 'Ya lo tienes';
+    rFalta.className = 'stat-value pos';
+  } else {
+    rFalta.textContent = fmtEUR(Math.round(faltaAhorrar));
+    rFalta.className = 'stat-value neg';
+  }
+
+  const box = $('verdictBox');
+  const label = $('verdictLabel');
+  const big = $('verdictBig');
+  const pill = $('verdictPill');
+  if (concedida){
+    box.className = 'verdict ok';
+    label.textContent = 'CONCEDIDA';
+    big.textContent = 'SÍ';
+    pill.textContent = '✓';
+  } else {
+    box.className = 'verdict no';
+    label.textContent = 'CONCEDIDA';
+    big.textContent = 'NO';
+    pill.textContent = '✕';
+  }
+
+  const cuotaEl = $('rCuota');
+  cuotaEl.className = cuota > cuotaMax ? 'stat-value neg' : 'stat-value';
+
+  save();
+}
+
+fields.forEach(f=>{
+  $(f).addEventListener('input', calc);
+});
+
+load();
+calc();
+</script>
+
+</body>
+</html>
